@@ -1,5 +1,3 @@
-use axum::handler::HandlerWithoutStateExt;
-
 use crate::AppState;
 use std::error::Error;
 

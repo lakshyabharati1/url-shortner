@@ -1,2 +1,5 @@
 /target
-/db
+
+# Runtime sled database files
+/db/*
+!/db/.gitkeep
