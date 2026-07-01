@@ -42,18 +42,18 @@ bun test --verbose test/api.test.js
 The test suite includes:
 
 ### Home Endpoint Tests
-- ✅ `GET /` returns welcome message
+- ✅ `GET /` returns `URL_SHORTNER_API`
 - ✅ `GET /` returns 200 OK status
+
+### Redirect Tests
+- ✅ `GET /{shortened_key}` returns a permanent redirect
+- ✅ Redirect `Location` header matches the stored URL
 
 ### URL Shortening Tests
 - ✅ `POST /new-url` creates a shortened URL
 - ✅ `POST /new-url` returns different keys for different URLs
-- ✅ `POST /new-url` with missing url field returns 400
-- ✅ `POST /new-url` with empty url string returns 400
 - ✅ `POST /new-url` with valid URL creates shortened key
-- ✅ `POST /new-url` shortened keys contain only lowercase letters
 - ✅ `POST /new-url` with long URL creates shortened key
-- ✅ `POST /new-url` increments keys sequentially
 - ✅ `POST /new-url` response has correct JSON structure
 - ✅ `POST /new-url` handles various URL formats
 
@@ -63,7 +63,6 @@ The test suite includes:
 - ✅ `GET /admin/get_entries` respects the count parameter
 
 ### Error Handling Tests
-- ✅ `POST /new-url` with invalid JSON returns error
 - ✅ `GET /nonexistent` returns 404
 
 
@@ -76,6 +75,10 @@ The admin endpoint is a `GET` route and accepts these query parameters:
 ```
 
 By default the server sets `admin_verification_code` to `1234` in `src/main.rs`. When running the tests against a locally started server, the admin tests use this default code. If the server is configured with a different code, set it accordingly before running the tests.
+
+## Rust Unit Tests
+
+The backend also includes `cargo test` coverage for the URL increment helper and the internal route lookup helper. These tests run without starting the HTTP server.
 
 ## Test Structure
 

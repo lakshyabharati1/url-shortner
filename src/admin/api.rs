@@ -1,6 +1,11 @@
 use std::error::Error;
 
-use axum::{extract::{Query, State}, http::StatusCode, response::IntoResponse, Json};
+use axum::{
+    Json,
+    extract::{Query, State},
+    http::StatusCode,
+    response::IntoResponse,
+};
 use serde::{Deserialize, Serialize};
 
 use crate::AppState;

@@ -38,3 +38,32 @@ pub async fn increment(vec: &[u8]) -> Vec<u8> {
 
     incremented_char
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{increment, new_url};
+    use crate::AppState;
+
+    #[tokio::test]
+    async fn increment_rolls_over_z_to_aa() {
+        assert_eq!(increment(b"z").await, b"aa".to_vec());
+        assert_eq!(increment(b"az").await, b"ba".to_vec());
+        assert_eq!(increment(b"bz").await, b"ca".to_vec());
+    }
+
+    #[tokio::test]
+    async fn new_url_inserts_and_returns_key() {
+        let db = sled::Config::new().temporary(true).open().unwrap();
+        let tree = db.open_tree("url").unwrap();
+
+        let state = AppState {
+            url_db: tree.clone(),
+            admin_verification_code: String::from("1234"),
+        };
+
+        let key = new_url("https://example.com", state).await.unwrap();
+
+        assert_eq!(key, "a");
+        assert_eq!(tree.get("a").unwrap().unwrap(), b"https://example.com".to_vec());
+    }
+}

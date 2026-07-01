@@ -3,3 +3,5 @@
 # Runtime sled database files
 /db/*
 !/db/.gitkeep
+./.agents
+./.codex

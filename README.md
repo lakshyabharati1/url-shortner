@@ -26,12 +26,21 @@ The server will start on `http://127.0.0.1:3000` by default
 ## API Endpoints
 
 ### GET /
-Returns a welcome message.
+Returns the `URL_SHORTNER_API` status string.
 
 **Response:**
 ```
 HTTP/1.1 200 OK
-Welcome to URL SHORTNER API
+URL_SHORTNER_API
+```
+
+### GET /{params}
+Looks up a shortened key and redirects to the stored destination URL.
+
+**Response:**
+```http
+HTTP/1.1 308 Permanent Redirect
+Location: https://example.com
 ```
 
 ### POST /new-url
@@ -54,6 +63,18 @@ Creates a new shortened URL.
 **Status Codes:**
 - `200 OK`: URL successfully shortened
 - `400 Bad Request`: Invalid request or error during processing
+
+### GET /admin/get_entries
+Returns stored key/value pairs for admin inspection.
+
+**Query Parameters:**
+```text
+admin_verification_code=1234&search=&count=10
+```
+
+**Status Codes:**
+- `200 OK`: Matching entries returned
+- `401 Unauthorized`: Invalid admin verification code
 
 ## Project Structure
 
@@ -81,8 +102,8 @@ The service generates sequential, incrementing keys using a base-26 alphabet (a-
 
 1. **First URL**: `a`
 2. **Second URL**: `b`
-3. **After 26 URLs**: `ba`
-4. **Pattern**: Similar to Excel column naming (a, b, ..., z, ba, bb, ...)
+3. **After 26 URLs**: `aa` in the current implementation
+4. **Pattern**: Sequential lowercase key generation with carry-based overflow handling
 
 This approach ensures:
 - **Compact keys**: Short, human-readable identifiers
@@ -108,7 +129,13 @@ The project uses **Sled**, an embedded key-value store:
 
 ## Testing
 
-Run the test suite using Bun:
+Run the Rust unit tests:
+
+```bash
+cargo test
+```
+
+Run the Bun integration tests:
 
 ```bash
 bun test test/api.test.js
@@ -121,7 +148,10 @@ BASE_URL=http://localhost:3000 bun test test/api.test.js
 ```
 
 Current tests:
-- `GET /` - Verifies welcome message endpoint
+- `GET /` - Verifies the `URL_SHORTNER_API` status string
+- `GET /{params}` - Verifies shortened URL redirects
+- `POST /new-url` - Creates and validates shortened keys
+- `GET /admin/get_entries` - Verifies admin access and returned entries
 
 ## Development
 
@@ -152,4 +182,3 @@ If you encounter database lock errors, ensure:
 - Only one instance of the server is running
 - The `./db` directory is not corrupted
 - Try removing the `./db` directory and restarting (data will be lost)
-``
