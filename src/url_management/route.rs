@@ -20,6 +20,10 @@ pub async fn router(route: String, state: AppState) -> Result<Option<String>, Bo
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
+    use tokio::sync::Mutex;
+
     use super::router;
     use crate::AppState;
 
@@ -32,6 +36,7 @@ mod tests {
         let state = AppState {
             url_db: tree,
             admin_verification_code: String::from("1234"),
+            last_url: Arc::new(Mutex::new(String::from("a"))),
         };
 
         let result = router(String::from("abc"), state).await.unwrap();
@@ -47,6 +52,7 @@ mod tests {
         let state = AppState {
             url_db: tree,
             admin_verification_code: String::from("1234"),
+            last_url: Arc::new(Mutex::new(String::from("a"))),
         };
 
         let result = router(String::from("missing"), state).await.unwrap();

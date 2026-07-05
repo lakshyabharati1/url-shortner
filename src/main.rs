@@ -1,7 +1,10 @@
+use std::sync::Arc;
+
 use axum::{
     Router, extract::{Path, State}, http::StatusCode, response::{IntoResponse, Redirect}, routing::{get, post}
 };
-use backend::{AppState, admin::api::get_entries_api, url_management::{api::new_url_api, route::router}};
+use backend::{AppState, admin::api::get_entries_api, get_last_url, url_management::{api::new_url_api, route::router}};
+use tokio::sync::Mutex;
 
 pub async fn home() -> impl IntoResponse {
     (StatusCode::OK, "URL_SHORTNER_API").into_response()
@@ -41,10 +44,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let url_tree = db.open_tree("url")?;
 
     // Axum Router Initailisation
-
+    let last_url = match get_last_url(url_tree.clone()).await {
+        Ok(x) => x,
+        Err(x) => {
+            eprintln!("Error: {}", x);
+            panic!("");
+        }
+    };
+    
+    println!("Last Shortened URL was with key: {}", last_url);
+    
     let state = AppState {
         url_db: url_tree,
         admin_verification_code: String::from("1234"),
+        last_url: Arc::new(Mutex::new(last_url)),
     };
 
     let app = Router::new()
